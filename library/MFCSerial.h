@@ -22,8 +22,7 @@ class MFCSerial{
 
 public:
   // Constructors
-  MFCSerial(HardwareSerial* portA);
-
+  MFCSerial(Stream* portA);
   // MFC compatible functions
   void setFlow(float flow);
   void setupFlow(int baud, float max=5.0, String ID="A");
@@ -31,7 +30,7 @@ public:
 
 private:
 
-  HardwareSerial* port;
+  Stream* port;
   String unitID = "A";
   float maxFlow = 5.0;
   float currentFlow = 0;

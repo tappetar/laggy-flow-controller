@@ -12,7 +12,11 @@
 #include <Wire.h>
 #include "Print.h"
 
+MFCSerial::MFCSerial(Stream *p){
 
+  port = p;
+
+}
 
 void MFCSerial::setFlow(float flow){
   if(flow > maxFlow){
@@ -27,8 +31,8 @@ void MFCSerial::setFlow(float flow){
 }
 
 void MFCSerial::setupFlow(int baud, float max=5.0, String ID="A"){
-  port.setTimeout(100);
-  port.begin(38400);
+  port->setTimeout(100);
+  //port->begin(baud);
   maxFlow = max;
   unitID = ID;
   port->print("\r\r" + unitID + "@=" + ID + "\r"); 
