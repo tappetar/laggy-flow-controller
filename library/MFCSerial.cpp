@@ -26,23 +26,16 @@ void MFCSerial::setFlow(float flow){
   port->print("\r\r" + unitID + (String)flow + "\r");
 }
 
-void MFCSerial::setupFlow(){
-  //help what is this supposed to do 
-  return;
+void MFCSerial::setupFlow(int baud, float max=5.0, String ID="A"){
+  port.setTimeout(100);
+  port.begin(38400);
+  maxFlow = max;
+  unitID = ID;
+  port->print("\r\r" + unitID + "@=" + ID + "\r"); 
 }
 
 float MFCSerial::getFlow(){
   return currentFlow;
 }
-
-void MFCSerial::setUnitID(String ID){
-  unitID = ID;
-  port->print("\r\r" + unitID + "@=" + ID + "\r"); 
-}
-
-void MFCSerial::setMaxFlow(float f){
-  maxFlow = f;
-}
-
 
 

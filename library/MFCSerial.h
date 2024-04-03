@@ -26,10 +26,8 @@ public:
 
   // MFC compatible functions
   void setFlow(float flow);
-  void setupFlow();
+  void setupFlow(int baud, float max=5.0, String ID="A");
   float getFlow();
-  void setUnitID(String ID);
-  void setMaxFlow(float f);
 
 private:
 
