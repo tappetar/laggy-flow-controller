@@ -11,8 +11,6 @@ String unitID = "A";
 const float maxFlow = 5.0;
 float adjustedFlowSet;  
 float speed;
-float TGas1 = 0.05;
-float TGas2 = 0.05;
 float Gas1 = 0;
 float Gas2 = 0;
 float Gas3 = 0;
