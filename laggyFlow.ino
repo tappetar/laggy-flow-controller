@@ -1,7 +1,13 @@
 #include <LiquidCrystal_I2C.h>
+#include <MFCSerial.h>
+MFCSerial mfc1(&Serial2); //C
+MFCSerial mfc2(&Serial1); //O
+MFCSerial mfc3(&Serial3); //N
+
+
+
 LiquidCrystal_I2C lcd(0x27,20,4);
 String unitID = "A";
-String unitIDB = "B";
 const float maxFlow = 5.0;
 float adjustedFlowSet;  
 float speed;
@@ -16,18 +22,24 @@ float Gas3 = 0;
 
 
 void setup() {
+
+
+  mfc1.setupFlow(38400, 5.0, "A");
+  mfc2.setupFlow(38400, 5.0, "A");
+  mfc3.setupFlow(38400, 5.0, "A");
+
   pinMode(A1, INPUT);
   pinMode(A2, INPUT);
   pinMode(A3, INPUT);
   pinMode(A4, INPUT);
-  pinMode(4, OUTPUT);
+  pinMode(7, OUTPUT);
   pinMode(5, OUTPUT);
   pinMode(6, OUTPUT);
-  pinMode(7, OUTPUT);
-  digitalWrite(4, HIGH);
+  pinMode(2, OUTPUT);
+  digitalWrite(7, HIGH);
   digitalWrite(5, HIGH);
   digitalWrite(6, HIGH);
-  digitalWrite(7, HIGH);
+  digitalWrite(2, HIGH);
 
  
   lcd.init();
@@ -50,12 +62,16 @@ void setup() {
 
 
   Serial.begin(9600);
-  Serial1.setTimeout(100);
+
   Serial1.begin(38400);
+  Serial1.setTimeout(100);
+
   Serial2.begin(38400);
   Serial2.setTimeout(100);
+
   Serial3.begin(34800);
-  Serial2.setTimeout(100);
+  Serial3.setTimeout(100);
+
   Serial1.print("\r\r");
   Serial2.print("\r\r");
   Serial3.print("\r\r");
@@ -73,6 +89,7 @@ void loop() {
   if(frac2+frac1 > 1){
     frac2 = 1.01-frac1;
   }
+
   double frac3 = abs(1-frac1-frac2);
 
   lcd.setCursor(3,1); lcd.print(frac1*100); 
@@ -124,6 +141,8 @@ void loop() {
 
     adjustedFlowSet = (Gas1/maxFlow)*64000;
     Serial2.print("\r\r" + unitID + (String)adjustedFlowSet + "\r");
+    //mfc1.setFlow(Gas1);
+
     
   }
 
@@ -140,8 +159,8 @@ void loop() {
 
     lcd.setCursor(16,2); lcd.print(Gas2);
 
-    adjustedFlowSet = (Gas2/maxFlow)*64000;
-    Serial1.print("\r\r" + unitID + (String)adjustedFlowSet + "\r");
+    //adjustedFlowSet = (Gas2/maxFlow)*64000;
+    mfc2.setFlow(Gas2);
   }
 
   if(abs(TGas3-Gas3) > (speed/30000)){
@@ -157,47 +176,15 @@ void loop() {
 
     lcd.setCursor(16,3); lcd.print(Gas3);
 
-    adjustedFlowSet = (Gas3/maxFlow)*64000;
+    //adjustedFlowSet = (Gas3/maxFlow)*64000;
+    //Serial.println((String)adjustedFlowSet);
     //Serial3.print("\r\r" + unitID + (String)adjustedFlowSet + "\r");
+    mfc3.setFlow(Gas3);
   }
-    Serial3.print("\r\r" + unitID + (String)adjustedFlowSet + "\r");
+    
+    
 
 
-
-
-  // while((abs(TGas1-targetco2) > (speed/30000)) || (abs(TGas2-targeto2) > (speed/30000))){
-  //   speed = 32 + analogRead(A1); //extra calcs later -> 32 = 1SLM^2)
-  //   targetco2 = map(analogRead(A2), 0, 1023, 5, 200);
-  //   targetco2 = targetco2/100;
-  //   targeto2 = map(analogRead(A2), 0, 1023, 5, 200);
-  //   targeto2 = targeto2/100;
-  //   lcd.setCursor(6,0); lcd.print((String)targetco2 + " SLM" + "  ");
-  //   lcd.setCursor(15,0); lcd.print((String)targetco2 + " SLM" + "  ");
-
-
-  //   if(TGas1 < targetco2){
-  //     TGas1 = TGas1 + speed/60000;
-  //   }
-  //   else{
-  //     TGas1 = TGas1 - speed/60000;
-  //   }
-
-  //   if(TGas2 < targeto2){
-  //     TGas2 = TGas2 + speed/60000;
-  //   }
-  //   else{
-  //     TGas2 = TGas2 - speed/60000;
-  //   }
-
-  //   lcd.setCursor(9,1); lcd.print((String)TGas1 + " SLM" + "  ");
-  //   lcd.setCursor(9,2); lcd.print((String)TGas2 + " SLM" + "  "); 
-  //   lcd.setCursor(8,3); lcd.print((String)(speed/32) + " SLM^2");
-
-
-
-  //   adjustedFlowSet = (TGas2/maxFlow)*64000;
-  //   Serial2.print("\r\r" + unitIDB + (String)adjustedFlowSet + "\r");
-  // }
 
   
 
