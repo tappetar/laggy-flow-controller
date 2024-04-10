@@ -78,17 +78,17 @@ void setup() {
 }
 
 void loop() {
-  double frac1 = map(analogRead(A3), 0, 1023, 0, 600);
-  frac1 = frac1/10000;
+  double frac1 = map(analogRead(A3), 0, 1023, 0, 600); // 0.01% of total sweep
+  frac1 = frac1/10000.0;
 
-  double frac2 = map(analogRead(A2), 0, 1023, 0, 1000);
-  frac2 = frac2/1000;
+  double frac2 = map(analogRead(A2), 0, 1023, 0, 10000); // 0.01% of total sweep
+  frac2 = frac2/10000.0;
 
   if(frac2+frac1 > 1){
-    frac2 = 1.01-frac1;
+    frac2 = 1.0-frac1;
   }
 
-  double frac3 = abs(1-frac1-frac2);
+  double frac3 = max(min(1.0-frac1-frac2,1.0),0.0);
 
   lcd.setCursor(3,1); lcd.print(frac1*100); 
   lcd.setCursor(3,2); lcd.print(frac2*100); 
@@ -97,8 +97,8 @@ void loop() {
  
 
 
-  double sum = map(analogRead(A1),0, 1023, 5, 200);
-  sum = sum/100;
+  double sum = map(analogRead(A1),0, 1023, 5, 200); // 10 mL
+  sum = sum/100.0;
   double TGas1 = frac1*sum;
   double TGas2 = frac2*sum;
   double TGas3 = frac3*sum;
