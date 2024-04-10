@@ -125,62 +125,34 @@ void loop() {
   
 
 
-  if(abs(TGas1-Gas1) > (speed/300000)){
-
-    if(TGas1 > Gas1){
-      Gas1 += speed/300000;
+   speed = speed / 100000.0;
+  if(abs(tTotal-total) > (speed)){
+    if(tTotal > total){
+      total += speed;
     }
-
     else{
-      Gas1 -= speed/300000;
-    } 
-
-    lcd.setCursor(16,1); lcd.print(Gas1);
-
-    adjustedFlowSet = (Gas1/maxFlow)*64000;
-    Serial2.print("\r\r" + unitID + (String)adjustedFlowSet + "\r");
-    //mfc1.setFlow(Gas1);
-
-    
+      total -= speed;
+    }
   }
 
-  if(abs(TGas2-Gas2) > (speed/30000)){
+  Gas1 = total*frac1;
+  Gas2 = total*frac2;
+  Gas3 = total*frac3;
+  
+  lcd.setCursor(16,1); lcd.print(Gas1);
+  // adjustedFlowSet = (Gas1/maxFlow)*64000;
+  // Serial2.print("\r\r" + unitID + (String)adjustedFlowSet + "\r");
+  mfc1.setFlow(Gas1);
+   
+  lcd.setCursor(16,2); lcd.print(Gas2);
+  //adjustedFlowSet = (Gas2/maxFlow)*64000;
+  mfc2.setFlow(Gas2);
 
-    if(TGas2 > Gas2){
-      Gas2 += speed/30000;
-    }
-
-    else{
-      Gas2 -= speed/30000;
-    } 
-
-
-    lcd.setCursor(16,2); lcd.print(Gas2);
-
-    //adjustedFlowSet = (Gas2/maxFlow)*64000;
-    mfc2.setFlow(Gas2);
-  }
-
-  if(abs(TGas3-Gas3) > (speed/30000)){
-
-    if(TGas3 > Gas3){
-      Gas3 += speed/30000;
-    }
-
-    else{
-      Gas3 -= speed/30000;
-    } 
-
-
-    lcd.setCursor(16,3); lcd.print(Gas3);
-
-    //adjustedFlowSet = (Gas3/maxFlow)*64000;
-    //Serial.println((String)adjustedFlowSet);
-    //Serial3.print("\r\r" + unitID + (String)adjustedFlowSet + "\r");
-    mfc3.setFlow(Gas3);
-  }
-    
-    
+  lcd.setCursor(16,3); lcd.print(Gas3);
+  //adjustedFlowSet = (Gas3/maxFlow)*64000;
+  //Serial.println((String)adjustedFlowSet);
+  //Serial3.print("\r\r" + unitID + (String)adjustedFlowSet + "\r");
+  mfc3.setFlow(Gas3);
 
 
 
