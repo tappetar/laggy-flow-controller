@@ -23,6 +23,7 @@ class MFCSerial{
 public:
   // Constructors
   MFCSerial(HardwareSerial* portA);
+
   // MFC compatible functions
   void setFlow(float flow);
   void setupFlow(int baud, float max=5.0, String ID="A");
