@@ -1,8 +1,12 @@
 #include <LiquidCrystal_I2C.h>
 #include <MFCSerial.h>
+#include <SoftwareSerial.h>
+
+SoftwareSerial fake3(6, 7);
+
 MFCSerial mfc1(&Serial2); //C
 MFCSerial mfc2(&Serial1); //O
-MFCSerial mfc3(&Serial3); //N
+MFCSerial mfc3(&fake3); //N
 
 
 
@@ -26,18 +30,18 @@ void setup() {
   mfc2.setupFlow(38400, 5.0, "A");
   mfc3.setupFlow(38400, 5.0, "A");
 
+  pinMode(A0, INPUT);
   pinMode(A1, INPUT);
   pinMode(A2, INPUT);
   pinMode(A3, INPUT);
-  pinMode(A4, INPUT);
-  pinMode(7, OUTPUT);
-  pinMode(5, OUTPUT);
-  pinMode(6, OUTPUT);
   pinMode(2, OUTPUT);
-  digitalWrite(7, HIGH);
-  digitalWrite(5, HIGH);
-  digitalWrite(6, HIGH);
+  pinMode(3, OUTPUT);
+  pinMode(8, OUTPUT);
+  pinMode(9, OUTPUT);
   digitalWrite(2, HIGH);
+  digitalWrite(3, HIGH);
+  digitalWrite(8, HIGH);
+  digitalWrite(9, HIGH);
 
  
   lcd.init();
@@ -70,6 +74,8 @@ void setup() {
   Serial3.begin(34800);
   Serial3.setTimeout(100);
 
+  fake3.begin(38400);
+
   Serial1.print("\r\r");
   Serial2.print("\r\r");
   Serial3.print("\r\r");
@@ -78,17 +84,18 @@ void setup() {
 }
 
 void loop() {
-  double frac1 = map(analogRead(A3), 0, 1023, 0, 600); // 0.01% of total sweep
+  
+  float frac1 = map(analogRead(A2), 0, 1023, 0, 4000); // 0.01% of total sweep
   frac1 = frac1/10000.0;
 
-  double frac2 = map(analogRead(A2), 0, 1023, 0, 10000); // 0.01% of total sweep
+  float frac2 = map(analogRead(A1), 0, 1023, 0, 10000); // 0.01% of total sweep
   frac2 = frac2/10000.0;
 
   if(frac2+frac1 > 1){
     frac2 = 1.0-frac1;
   }
 
-  double frac3 = max(min(1.0-frac1-frac2,1.0),0.0);
+  float frac3 = max(min(1.0-frac1-frac2,1.0),0.0);
 
   lcd.setCursor(3,1); lcd.print(frac1*100); 
   lcd.setCursor(3,2); lcd.print(frac2*100); 
@@ -97,66 +104,70 @@ void loop() {
  
 
 
-  double sum = map(analogRead(A1),0, 1023, 5, 200); // 10 mL
+  float sum = map(analogRead(A0),0, 1023, 5, 200); // 10 mL
   sum = sum/100.0;
-  double TGas1 = frac1*sum;
-  double TGas2 = frac2*sum;
-  double TGas3 = frac3*sum;
+  float TGas1 = frac1*sum;
+  float TGas2 = frac2*sum;
+  float TGas3 = frac3*sum;
 
 
 
   lcd.setCursor(11,1); lcd.print(TGas1); 
   lcd.setCursor(11,2); lcd.print(TGas2); 
   lcd.setCursor(11,3); lcd.print(TGas3);
-
   lcd.setCursor(7,3); lcd.print(" ");
-
   lcd.setCursor(6,0); lcd.print(sum); 
-  speed = (analogRead(A4) + 50);
+  speed = (analogRead(A3) + 50);
   lcd.setCursor(15,0); lcd.print(speed/25);
 
-  // TGas1 = frac1*sum;
-  // lcd.setCursor(6,2); lcd.print(TGas1);
-  // TGas2 = sum*(1-frac1);
-  // lcd.setCursor(6,3); lcd.print(TGas2);
 
 
 
   
 
 
-   speed = speed / 100000.0;
-  if(abs(tTotal-total) > (speed)){
-    if(tTotal > total){
-      total += speed;
+  if(abs(TGas1-Gas1) > (speed/300000)){
+
+    if(TGas1 > Gas1){
+      Gas1 += speed/300000;
     }
+
     else{
-      total -= speed;
-    }
+      Gas1 -= speed/300000;
+    } 
+
+    lcd.setCursor(16,1); lcd.print(Gas1);
+
+    mfc1.setFlow(Gas1*10);
   }
 
-  Gas1 = total*frac1;
-  Gas2 = total*frac2;
-  Gas3 = total*frac3;
-  
-  lcd.setCursor(16,1); lcd.print(Gas1);
-  // adjustedFlowSet = (Gas1/maxFlow)*64000;
-  // Serial2.print("\r\r" + unitID + (String)adjustedFlowSet + "\r");
-  mfc1.setFlow(Gas1);
-   
-  lcd.setCursor(16,2); lcd.print(Gas2);
-  //adjustedFlowSet = (Gas2/maxFlow)*64000;
-  mfc2.setFlow(Gas2);
+  if(abs(TGas2-Gas2) > (speed/30000)){
 
-  lcd.setCursor(16,3); lcd.print(Gas3);
-  //adjustedFlowSet = (Gas3/maxFlow)*64000;
-  //Serial.println((String)adjustedFlowSet);
-  //Serial3.print("\r\r" + unitID + (String)adjustedFlowSet + "\r");
-  mfc3.setFlow(Gas3);
+    if(TGas2 > Gas2){
+      Gas2 += speed/30000;
+    }
 
+    else{
+      Gas2 -= speed/30000;
+    } 
 
+    lcd.setCursor(16,2); lcd.print(Gas2);
 
-  
+    mfc2.setFlow(Gas2);
+  }
 
+  if(abs(TGas3-Gas3) > (speed/30000)){
 
+    if(TGas3 > Gas3){
+      Gas3 += speed/30000;
+    }
+
+    else{
+      Gas3 -= speed/30000;
+    } 
+
+    lcd.setCursor(16,3); lcd.print(Gas3);
+
+    mfc3.setFlow(Gas3);
+  }
 }
